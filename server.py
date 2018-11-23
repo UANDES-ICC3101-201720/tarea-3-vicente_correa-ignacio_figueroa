@@ -13,9 +13,9 @@ class client:
         self.files = []
 
 clientePrueba = client()
-clientePrueba.ip = "192.168.0.31"
+clientePrueba.ip = "192.168.0.31" #METER LA IP DEL CLIENTE QUE VA A ENTREGAR EL ARCHIVO
 clientePrueba.port = "45678"
-clientePrueba.files=["Foto1.jpg", "Foto2.jpg", "Prueba.txt"]
+clientePrueba.files=["Prueba.jpg", "Prueba.txt"]
 sockets = []
 with socket.socket() as s:
     online.append(clientePrueba)
