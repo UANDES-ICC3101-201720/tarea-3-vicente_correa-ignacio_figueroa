@@ -11,10 +11,22 @@ def escuchar_siempre():
     port = 50008
     address = (host, port)
     with socket.socket() as sn:
-        sn.bind(address)
-        sn.listen(1)
-        conn, addr = sn.accept()
-        print("thread conectado")
+        while True:
+            sn.bind(address)
+            sn.listen(1)
+            conn, addr = sn.accept()
+            print("thread conectado")
+
+            mensaje = conn.recv(BUFFER_SIZE).decode()
+            if str(mensaje).__contains__("A LITTLE BIRD"):
+                f_name = str(mensaje).split("<")
+                f_name = f_name[1].strip(">")
+                conn.send("YEP, I GOT I BABE".encode())
+                with open(f_name, 'rb') as f:
+                    data = f.read(BUFFER_SIZE)
+                    while data:
+                        conn.sendall(data)
+                        data = f.read(BUFFER_SIZE)
 
 archivos = []
 for arc in ls():
@@ -22,7 +34,7 @@ for arc in ls():
         archivos.append(arc)
 
 try:
-    _thread.start_new_thread(escuchar_siempre, None)
+    _thread.start_new_thread(escuchar_siempre, ())
 except:
     print("error del threaaaaad")
 
@@ -30,8 +42,6 @@ host = '192.168.0.31'
 print(host)
 port = 50007
 address = (host, port)
-
-
 
 with socket.socket() as s:
     print("socket creado")
@@ -90,14 +100,22 @@ with socket.socket() as s:
                 print("elegiste la ip {}".format(ips_con_archivo[int(ip_elegido) - 1]))
                 print()
 
-                host = ips_con_archivo[int(ip_elegido) - 1]
-                port = 50008
-                address = (host, port)
-                s.connect(address)
-                print("conectado con el nuevo")
-
-
-
+                host2 = ips_con_archivo[int(ip_elegido) - 1]
+                port2 = 50008
+                address2 = (host2, port2)
+                with socket.socket() as s2:
+                    s2.connect(address2)
+                    print("conectado con el nuevo")
+                    mensaje = "A LITTLE BIRD SAID ME THAT YOU HAVE <{}>".format(file_name)
+                    s2.send(mensaje.encode())
+                    confirmacion = s2.recv(BUFFER_SIZE).decode()
+                    print(confirmacion)
+                    archivo_recibido = file_name
+                    with open(archivo_recibido, "wb") as f:
+                        buf = s2.recv(BUFFER_SIZE)
+                        while buf:
+                            f.write(buf)
+                            buf = s2.recv(BUFFER_SIZE)
 
         elif opcion == "2":
             sys.exit(0)
