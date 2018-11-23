@@ -1,21 +1,38 @@
 import socket
 import sys
 from os import scandir, getcwd
-
+import _thread
+BUFFER_SIZE = 1024
 def ls(ruta = getcwd()):
     return [arch.name for arch in scandir(ruta) if arch.is_file()]
-host = '192.168.0.31'
-print(host)
-port = 50007
-BUFFER_SIZE = 1024
-file = "recibido2.jpg"
-address = (host, port)
+def escuchar_siempre():
+    print("entro a la funcion de thread")
+    host = ''
+    port = 50008
+    address = (host, port)
+    with socket.socket() as sn:
+        sn.bind(address)
+        sn.listen(1)
+        conn, addr = sn.accept()
+        print("thread conectado")
 
 archivos = []
 for arc in ls():
     if ".txt" in arc or ".jpg" in arc:
         archivos.append(arc)
-print(archivos)
+
+try:
+    _thread.start_new_thread(escuchar_siempre, None)
+except:
+    print("error del threaaaaad")
+
+host = '192.168.0.31'
+print(host)
+port = 50007
+address = (host, port)
+
+
+
 with socket.socket() as s:
     print("socket creado")
     s.connect(address)
@@ -42,8 +59,7 @@ with socket.socket() as s:
     while True:
         print("Que deseas hacer?\n"
               "\t (1) Buscar archivo\n"
-              "\t (2) Enviar archivo\n"
-              "\t (3) Salir")
+              "\t (2) Salir")
         opcion = input("Ingrese su opcion: ")
         if opcion == "1":
             ips_con_archivo = []
@@ -74,10 +90,16 @@ with socket.socket() as s:
                 print("elegiste la ip {}".format(ips_con_archivo[int(ip_elegido) - 1]))
                 print()
 
+                host = ips_con_archivo[int(ip_elegido) - 1]
+                port = 50008
+                address = (host, port)
+                s.connect(address)
+                print("conectado con el nuevo")
+
+
+
 
         elif opcion == "2":
-            pass
-        elif opcion == "3":
             sys.exit(0)
 
 
